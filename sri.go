@@ -151,3 +151,8 @@ func describeExpected(expected []string) string {
 	}
 	return fmt.Sprintf("one of [%s]", strings.Join(expected, ", "))
 }
+
+// Expected returns the expected hashes for the given hash name.
+func (c *Checker) Expected(name string) []string {
+	return c.expected[name]
+}

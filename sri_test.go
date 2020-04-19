@@ -120,3 +120,24 @@ func TestNoInput(t *testing.T) {
 	_, err := NewChecker(``)
 	assert.Error(t, err)
 }
+
+func TestExpected(t *testing.T) {
+	c, err := NewChecker(`
+sha256-y1v31NktLrKLVp1gbS7zjWtYgDICENEw7hKLJHcw4E0=
+sha384-4QuseiT9WQ+80EDZ/MYTodasdNBTLIC/9G1XmSQDmTjTvDM8q00Vgxa9nMgwUw3j
+sha512-xLpYEEen45RJnXxmFACS66+sO/1Xuo192Xq6uIarYI4uE7MZevI2pTyoKUZAFVP9tvfhJTS6YjOJcMc8ckoRkw==
+sha256-49hwASqGvw3v5oq2Pu4U2jR2Pv9KCMm2VGFAqCwEXhI=
+sha384-ixBUOCmT6wnGpEL5AxEsAm9EdJCBj7kF099SUkvIbtB63ydFdgNgXVj784BCcJ2k
+sha512-jt9sSgTPOFnKQWLknlJEWjBq6UaOcjZzJOwlSgaEWr1b8IfmBmOMJZ91TmrZzjbUUB211oxxKEjyOBQHeXiDoA==
+`)
+	assert.NoError(t, err)
+	assert.Equal(t, []string{
+		"y1v31NktLrKLVp1gbS7zjWtYgDICENEw7hKLJHcw4E0=",
+		"49hwASqGvw3v5oq2Pu4U2jR2Pv9KCMm2VGFAqCwEXhI=",
+	}, c.Expected("sha256"))
+	assert.Equal(t, []string{
+		"xLpYEEen45RJnXxmFACS66+sO/1Xuo192Xq6uIarYI4uE7MZevI2pTyoKUZAFVP9tvfhJTS6YjOJcMc8ckoRkw==",
+		"jt9sSgTPOFnKQWLknlJEWjBq6UaOcjZzJOwlSgaEWr1b8IfmBmOMJZ91TmrZzjbUUB211oxxKEjyOBQHeXiDoA==",
+	}, c.Expected("sha512"))
+	assert.Nil(t, c.Expected("md5"))
+}
