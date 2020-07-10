@@ -7,6 +7,7 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"hash"
 	"io"
@@ -125,9 +126,11 @@ func (c *Checker) Check() error {
 	var msgs []string
 	for name, hash := range c.hashes {
 		expected := c.expected[name]
-		value := base64.StdEncoding.EncodeToString(hash.Sum(nil))
+		h := hash.Sum(nil)
+		value := base64.StdEncoding.EncodeToString(h)
 		if !contains(expected, value) {
-			msgs = append(msgs, fmt.Sprintf("violated %s integrity check; was %s, expected %s", name, value, describeExpected(expected)))
+			hexValue := hex.EncodeToString(h)
+			msgs = append(msgs, fmt.Sprintf("violated %s integrity check; was %s, expected %s (a.k.a. was %s, expected %s)", name, value, describeExpected(expected), hexValue, describeExpected(toHex(expected))))
 		}
 	}
 	if len(msgs) != 0 {
@@ -150,6 +153,17 @@ func describeExpected(expected []string) string {
 		return expected[0]
 	}
 	return fmt.Sprintf("one of [%s]", strings.Join(expected, ", "))
+}
+
+// toHex converts a slice of base64-encoded strings to hex-encoded.
+func toHex(expected []string) []string {
+	ret := make([]string, len(expected))
+	for i, e := range expected {
+		// We know these are valid because we check it in validateHash.
+		raw, _ := base64.StdEncoding.DecodeString(e)
+		ret[i] = hex.EncodeToString(raw)
+	}
+	return ret
 }
 
 // Expected returns the expected hashes for the given hash name.
