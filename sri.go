@@ -170,3 +170,8 @@ func toHex(expected []string) []string {
 func (c *Checker) Expected(name string) []string {
 	return c.expected[name]
 }
+
+// ExpectedHex returns the expected hashes for the given hash name, hex-encoded.
+func (c *Checker) ExpectedHex(name string) []string {
+	return toHex(c.Expected(name))
+}
